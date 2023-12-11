@@ -17,14 +17,23 @@ app.post('/chat', async (req, res) => {
   try {
     const { prompt } = req.body;
 
-    // Correct usage of OpenAI API method
+    // Assuming 'prompt' contains the user's message
+     const messages = [
+        { role: "system", content: "You are a helpful assistant." },
+        { role: "user", content: prompt }
+      ];
+
+    // Completion code
     const completion = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        prompt: prompt,
-        max_tokens: 150,
+      model: "gpt-3.5-turbo",
+      messages: messages,
+      max_tokens: 150,
     });
 
-    res.send(completion.data.choices[0].text);
+    // console.log(completion.choices[0].message.content);
+
+    const reply = completion.choices[0].message.content;
+    res.send(reply);
 
 
   } catch (error) {
