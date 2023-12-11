@@ -2,43 +2,37 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
-const port = process.env.PORT;
-// Load environment variables
+const { OpenAI } = require('openai');
+
 dotenv.config();
 
-const { Configuration, OpenAIApi } = require('openai');
+const port = process.env.PORT;
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API });
 
-const config = new Configuration({
-    apiKey: process.env.OPENAI_API,
-})
-
-const openai = new OpenAIApi(config);
-
-// Setup server
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-// Endpoint for GPT
-app.post("/chat", async (req, res) => {
-    try {
-        const { prompt } = req.body;
+app.post('/chat', async (req, res) => {
+  try {
+    const { prompt } = req.body;
 
-        const completion = await openai.createCompletion({
-            model: "text-davinci-003",
-            max_tokens: 512,
-            temperature: 0,
-            prompt: prompt,
-        });
+    // Correct usage of OpenAI API method
+    const completion = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        prompt: prompt,
+        max_tokens: 150,
+    });
 
-        res.send(completion.data.choices[0].text);
-    } catch (error) {
-        console.error('Error processing OpenAI request:', error);
-        res.status(500).send('Internal Server Error');
-    }
+    res.send(completion.data.choices[0].text);
+
+
+  } catch (error) {
+    console.error('Error processing OpenAI request:', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
-
-app.listen(port, ()=>{
-    console.log(`Server listening on port ${port}`);
-})
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
