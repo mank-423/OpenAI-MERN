@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
 
 const Chat = () => {
     const [prompt, setPrompt] = useState('');
@@ -11,6 +12,7 @@ const Chat = () => {
     const [sessionCreated, setSessionCreated] = useState(false);
     const [sessionId, setSessionId] = useState(null);
     const [aiChat, setAiChat] = useState(null);
+    const [sessions, setSessions] = useState([]);
 
     let navigate = useNavigate();
 
@@ -83,11 +85,26 @@ const Chat = () => {
         }
     };
 
-    const handleCreateSessionClick = async () => {
-        // Create a new session when the submit button is clicked
-        await createSession();
-    }
+    const fetchSessions = async () => {
+        try {
+            const userId = localStorage.getItem('userId');
 
+            if (!userId) {
+                console.error('User ID is missing.');
+                return;
+            }
+
+            const response = await axios.get(`http://localhost:5000/api/session/user/${userId}`);
+            setSessions(response.data.data);
+        } catch (err) {
+            console.error('Error fetching sessions:', err);
+        }
+    };
+
+    const handleCreateSessionClick = async () => {
+        await createSession();
+        fetchSessions(); // Fetch sessions after creating a new session
+    };
 
     useEffect(() => {
         // Now you can use the sessionId and aiChat in your axios request
@@ -101,7 +118,7 @@ const Chat = () => {
                 })
                 .then((res) => {
                     console.log('Exchange created successfully:', res.data);
-                    
+
                     //Whenever we submit new mssg
                     fetchExchanges();
                 })
@@ -111,6 +128,7 @@ const Chat = () => {
         }
         setPrompt("");
     }, [sessionId, aiChat]);
+
 
     useEffect(() => {
         if (localStorage.getItem('userId') === null) {
@@ -122,14 +140,24 @@ const Chat = () => {
     useEffect(() => {
         // Fetch exchanges when the component mounts or when sessionId changes
         if (sessionId) {
-          fetchExchanges();
+            fetchExchanges();
         }
-      }, [sessionId]);
+    }, [sessionId]);
 
 
 
     return (
         <div className='w-3/4 mx-auto py-24'>
+
+            <div className='sessions-container max-h-72 overflow-y-auto'>
+                {sessions.map((session, index) => (
+                    <div key={index} className='session p-4 border rounded-md mb-4 bg-gray-100'>
+                        <p className='text-black font-semibold'>Session ID: {session.sessionId}</p>
+                        <p className='text-green-500 font-semibold'>Start Time: {session.startTime}</p>
+                    </div>
+                ))}
+            </div>
+
             <div className='w-full max-w-md mx-auto'>
 
                 <button

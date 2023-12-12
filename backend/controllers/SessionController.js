@@ -49,3 +49,18 @@ exports.getSessionById = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
+// Controller function to get sessions of a specific user
+exports.getSessionsByUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Find sessions by userId
+    const sessions = await Session.find({ userId });
+
+    res.status(200).json({ data: sessions, message: 'Sessions retrieved successfully' });
+  } catch (error) {
+    console.error('Error getting sessions by user:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
