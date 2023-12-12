@@ -10,7 +10,6 @@ exports.createExchange = async (req, res) => {
     const newExchange = new Exchange({ userId, sessionId, userMessage, aiMessage });
     await newExchange.save();
 
-    // Find the corresponding session and add the exchange to its exchanges array
     await Session.findOneAndUpdate(
       { sessionId },
       { $push: { exchanges: newExchange._id } },
@@ -29,7 +28,6 @@ exports.getExchangeById = async (req, res) => {
   try {
     const { exchangeId } = req.params;
 
-    // Find exchange by ID
     const exchange = await Exchange.findOne({ _id: exchangeId });
 
     if (!exchange) {
@@ -43,7 +41,6 @@ exports.getExchangeById = async (req, res) => {
   }
 };
 
-// Controller function to get exchanges for a specific user and session
 exports.getExchangesByUserAndSession = async (req, res) => {
   try {
     const { userId, sessionId } = req.params;

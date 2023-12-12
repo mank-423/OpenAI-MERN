@@ -3,12 +3,11 @@ const Session = require('../models/SessionSchema');
 const User = require('../models/UserSchema');
 const Exchange = require('../models/ExchangeSchema');
 
-// Controller functions for session operations
 exports.createSession = async (req, res) => {
   try {
     const { userId, startTime, userMessage, aiMessage } = req.body;
 
-    // Generate a unique session ID using uuid
+    // Generate a unique session ID using uuid -> npm library
     const sessionId = uuidv4();
 
     // Create a new exchange
@@ -50,7 +49,6 @@ exports.getSessionById = async (req, res) => {
   }
 };
 
-// Controller function to get sessions of a specific user
 exports.getSessionsByUser = async (req, res) => {
   try {
     const { userId } = req.params;

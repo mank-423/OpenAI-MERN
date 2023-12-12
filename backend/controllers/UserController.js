@@ -1,6 +1,5 @@
 const User = require('../models/UserSchema');
 
-// Controller functions for user operations
 exports.createUser = async (req, res) => {
   try {
     const { userId } = req.body;
@@ -11,7 +10,7 @@ exports.createUser = async (req, res) => {
       return res.status(400).json({ error: 'User already exists' });
     }
 
-    // Create a new user
+    // Creating new user
     const newUser = new User({ userId });
     await newUser.save();
 
